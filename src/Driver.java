@@ -17,9 +17,7 @@ public class Driver {
 
         //Customer customer2 = new Customer("first2", "second2", "email");
 
-        MainMenu menu = new MainMenu();
-
-        menu.processMainMenu();
+        MainMenu.launchMainMenu();
 
 
     } catch (IllegalArgumentException ex)

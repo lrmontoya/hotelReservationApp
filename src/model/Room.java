@@ -50,7 +50,18 @@ public class Room implements IRoom {
     @Override
     public String toString()
     {
-        return "room number= " + roomNumber + " price= " + roomPrice + " Room type= " + roomType;
+        String roomType = null;
+
+        if (this.getRoomType().equals(RoomType.SINGLE)) {
+
+            roomType = " Single bed ";
+        }
+        else
+        {
+            roomType = " Double bed ";
+
+        }
+        return "Room number: " + roomNumber + roomType + "Room price: $" + roomPrice;
 
     }
 }

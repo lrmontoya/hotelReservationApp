@@ -37,6 +37,8 @@ public class HotelResource {
         return;
     }
 
+
+    //************************
     public IRoom getRoom(String roomNumber){
         return reservationService.getARoom(roomNumber);
     }

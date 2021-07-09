@@ -53,8 +53,10 @@ public class CustomerService {
 
            if (!mapOfCustomers.containsKey(customerEmail)) {
 
-                System.out.println("Error: there are no customers registered with the email provided\n");
-                throw new IllegalArgumentException();
+                //System.out.println("Error: there are no customers registered with the email provided\n");
+                return null;
+                //throw new IllegalArgumentException();
+                // 7/9/2022 I should not thrown an unhandled exception, better return null and handle the issue on the receiving function
 
             }
            else {

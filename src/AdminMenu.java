@@ -1,5 +1,6 @@
 import api.AdminResource;
 import api.HotelResource;
+import com.sun.tools.javac.Main;
 import model.*;
 
 import java.util.*;
@@ -9,23 +10,29 @@ import model.RoomType;
 
 public class AdminMenu {
 
-    private Scanner emailScan = new Scanner(System.in);
-    private Collection<IRoom> roomsCollection = new HashSet<>();
-    private List<IRoom> roomList = new ArrayList<>();
-    private Collection<Customer> allCustomers = new HashSet<>();
-    private Collection<Reservation> reservationCollection = new HashSet<>();
-    public AdminResource instanceAdminResource =   AdminResource.getInstance();
-    public HotelResource instanceHotelResource =   HotelResource.getInstance();
 
-    boolean keepRunning = true;
-    String optionAdminMenu;
+    public AdminMenu adminMenu = null;
+    private static Scanner emailScan = new Scanner(System.in);
+    private static Collection<IRoom> roomsCollection = new HashSet<>();
+    private static List<IRoom> roomList = new ArrayList<>();
+    private static Collection<Customer> allCustomers = new HashSet<>();
+    private static Collection<Reservation> reservationCollection = new HashSet<>();
+    public static AdminResource instanceAdminResource =   AdminResource.getInstance();
+    public static HotelResource instanceHotelResource =   HotelResource.getInstance();
 
-    public void createMenu() {
-        try (Scanner adminMenuScanner = new Scanner(System.in)) {
+    //private constructor to make sure there is 1 instance of the class at all times.
+    private AdminMenu(){};
 
-            while (keepRunning) {
+
+    public static void launchAdminMenu() {
+
+        boolean keepRunning = true;
+        String optionAdminMenu;
+
+        while (keepRunning) {
                 try {
 
+                    Scanner adminMenuScanner = new Scanner(System.in);
                     System.out.println("\n----------------------------------------");
                     System.out.println("1. See all Customers");
                     System.out.println("2. See all Rooms");
@@ -53,11 +60,11 @@ public class AdminMenu {
                                 }
 
                             }
-                            return;
+                            break;
                         //keepRunning = true;
 
                         case "2":
-                            roomsCollection.clear();
+                            //roomsCollection.clear();
                             roomsCollection = instanceAdminResource.getAllRooms();
                             if (roomsCollection.isEmpty()) {
                                 System.out.println("There are no rooms in the database");
@@ -69,17 +76,21 @@ public class AdminMenu {
                                 }
 
                             }
-                            keepRunning = true;
+                            break;
 
                         case "3":
                             instanceAdminResource.displayAllReservations();
-                            continue;
+                            break;
 
                         case "4":
-                            addRoom();
-                            continue;
+                            instanceAdminResource.addRoom(addRoom());
+                            //instanceAdminResource.getAllRooms();
+                            //keepRunning = false;
+                            break;
                         case "5":
-                            return;
+                            MainMenu.launchMainMenu();
+                            keepRunning = false;
+                            break;
                         //case "6":
                         //    return;
                         default:
@@ -90,62 +101,59 @@ public class AdminMenu {
                     System.out.println("Error - Invalid Input\n");
                 }
             }
-        }
-
     }
 
 
-    private List<IRoom> addRoom(){
+
+
+    private static List<IRoom> addRoom(){
 
         boolean keepGoing = true;
         String yesNo = null;
+        roomList.clear();
 
-        //String roomRegex = "([0-9]+)";
-        //Pattern pattern = Pattern.compile(roomRegex);
+        String ynRegex = "[ynYN]";
+        Pattern pattern = Pattern.compile(ynRegex);
+        IRoom room;
+        //Double roomPrice = getRoomPrice();
+        String roomNumber = getRoomNumber();
+        Double roomPrice = getRoomPrice();
+        RoomType roomType = getRoomType();
+        room = new Room(roomNumber, roomPrice, roomType);
+        //System.out.println("Adding room: " + room.toString()); // debug line
+        roomList.add(room);
 
         while (keepGoing) {
 
-            roomList.clear();
-            IRoom room;
-            //Double roomPrice = getRoomPrice();
-            String roomNumber = getRoomNumber();
-            Double roomPrice = getRoomPrice();
-            RoomType roomType = getRoomType();
-            room = new Room(roomNumber, roomPrice, roomType);
-            roomList.add(room);
+              try  {
+                Scanner yesNoScan = new Scanner(System.in);
+                System.out.println("Would you like to add another room y/n");
+                yesNo = yesNoScan.nextLine();
 
-            try (Scanner scanAddRooms = new Scanner(System.in)) {
-                System.out.println("Would you like to add another room y/n\n");
-                yesNo = scanAddRooms.nextLine();
-
-                if (yesNo.equals("y")) {
-                    keepRunning = true;
-                }
-                if (yesNo.equals("n")) {
-
-                    keepRunning = false;
-
-                } else {
-
-                    throw new IllegalArgumentException("Error, Invalid format, please enter numbers only y or n\n");
+                if (!pattern.matcher(yesNo).matches()){
+                    //System.out.println();
+                    keepGoing = true;
+                    throw new IllegalArgumentException();
 
                 }
+                else if (yesNo.equals("y")) { keepGoing = true;  }
+                else if (yesNo.equals("n")) { keepGoing = false; }
 
-            }catch(Exception ex){
-                System.out.println("Error - Invalid Input\n");
-
+            }catch(Exception ex) {
+                System.out.println("Error, Invalid format, please enter only y or n");
+                keepGoing = true;
             }
         }
-
 
         return roomList;
 
     }
 
 
-    private RoomType getRoomType() {
+    private static RoomType getRoomType() {
 
 
+        boolean keepRunning = true;
         RoomType roomType = RoomType.SINGLE;
         String userInput = null;
         String roomTypeRegex = "([1-2])";
@@ -153,26 +161,27 @@ public class AdminMenu {
 
         while (keepRunning){
 
-            try (Scanner roomTypeScan = new Scanner(System.in)) {
+            try  {
 
-                System.out.println("Enter room type: 1 for single bed, 2 for double\n");
+                Scanner roomTypeScan = new Scanner(System.in);
+                System.out.println("Enter room type: 1 for single bed, 2 for double");
                 userInput =  roomTypeScan.nextLine();
 
                 if (!pattern.matcher(userInput).matches()) {
 
-                    throw new IllegalArgumentException("Error, Invalid format, please enter 1 or 2\n");
+                    throw new IllegalArgumentException("Error, Invalid format, please enter 1 or 2");
 
                 }
 
             }catch(Exception ex) {
-                System.out.println("Error - Invalid Input\n");
+                System.out.println("Error - Invalid Input");
                 continue;
             }
             keepRunning = false;
 
         }
 
-        if (userInput.equals(1)){
+        if (userInput.equals("1")){
             roomType = RoomType.SINGLE;
         }
         else {
@@ -187,22 +196,19 @@ public class AdminMenu {
 
 
 
-    public String getRoomNumber(){
+    public static String getRoomNumber(){
 
-        boolean keepRunning = true;
+        //boolean keepRunning = true;
         String roomID = null;
-        String roomRegex = "([0-9]+)";
-        Pattern pattern = Pattern.compile(roomRegex);
-
-        //try (Scanner roomScan = new Scanner(System.in)) {
+        //String roomRegex = "([0-9]+)";
+        //Pattern pattern = Pattern.compile(roomRegex);
 
         roomID =  validateInputNumber();
 
-        //}
         return roomID;
     }
 
-    private Double getRoomPrice(){
+    private static Double getRoomPrice(){
 
         boolean keepRunning = true;
         Double roomPriceParsed = 0.0;
@@ -210,16 +216,16 @@ public class AdminMenu {
         String regexPrice = "([0-9]+)\\.?([0-9]+)?";
         Pattern pattern = Pattern.compile(regexPrice);
 
-        try (Scanner priceScan = new Scanner(System.in)) {
-
-            while (keepRunning){
+        while (keepRunning){
                 try {
 
+                    Scanner priceScan = new Scanner(System.in);
                     System.out.println("Enter the price per night: ");
                     roomPriceParsed = priceScan.nextDouble();
-                    if (!pattern.matcher(roomPrice).matches()){
+                    priceScan.nextLine(); // adding this line to consume the \n character
+                    if (!pattern.matcher(roomPriceParsed.toString()).matches()){
 
-                        throw new IllegalArgumentException("tirando exception");
+                        throw new IllegalArgumentException("Error Invalid input");
 
                     }
 
@@ -235,50 +241,64 @@ public class AdminMenu {
 
             }
 
-        }
         return roomPriceParsed;
     }
 
 
-    private String validateInputNumber(){
+    private static String validateInputNumber(){
 
         boolean validInput = false;
+        boolean keepRunning = true;
         boolean roomIdExists = false;
+        boolean roomListContainsRoom = false;
         String userInput = null;
         String roomRegex = "([0-9]+)";
         Pattern pattern = Pattern.compile(roomRegex);
 
-        try (Scanner numberScan = new Scanner(System.in)) {
+
 
             while (keepRunning){
                 try {
 
+                    Scanner numberScan = new Scanner(System.in);
                     System.out.println("What room number would you like to create");
                     userInput =  numberScan.nextLine();
 
                     if (!pattern.matcher(userInput).matches()) {
 
-                        throw new IllegalArgumentException("Error, Invalid format, please enter numbers only");
+                        System.out.println("Error, Invalid format, please enter numbers only");
+                        throw new IllegalArgumentException();
 
                     }
 
                     roomIdExists =  verifyUniqueId(userInput);
 
+                    //check if room exists in DB already
                     if (roomIdExists) {
 
-                        throw new IllegalArgumentException("Error, the room ID you entered already exists. Enter a unique room ID");
+                        System.out.println("Error, the room ID you entered already exists. Enter a unique room ID");
+                        throw new IllegalArgumentException();
+
+                    }
+                    //validate if room exists in the list of room tha is being created at the moment
+
+                    for (IRoom currentRoom : roomList){
+
+                        if (currentRoom.getRoomNumber().compareTo(userInput) == 0) {
+
+                            System.out.println("Error, the room ID you entered already exists. Enter a unique room ID");
+                            throw new IllegalArgumentException();
+
+                        }
 
                     }
 
                 }catch(Exception ex) {
-                    System.out.println("Error - Invalid Input");
+                    //System.out.println("Error - Invalid Input");
                     continue;
                 }
 
-                numberScan.close();
                 keepRunning = false;
-
-            }
 
 
         }
@@ -288,11 +308,11 @@ public class AdminMenu {
     }
 
 
-    public boolean verifyUniqueId( String userInput){
+    public static boolean verifyUniqueId(String userInput){
 
 
-        if (instanceHotelResource.getRoom(userInput) != null) { return true; }
-        return false;
+        if (instanceHotelResource.getRoom(userInput) == null) { return false; }
+        return true;
 
     }
 

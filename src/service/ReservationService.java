@@ -34,12 +34,12 @@ public class ReservationService
     {
         //String roomNumber, Double roomPrice, RoomType roomType
 
-            if (mapOfRooms.containsKey(room.getRoomNumber())){
+           // if (mapOfRooms.containsKey(room.getRoomNumber())){ // I'm already validating this in the AdminMenu class
 
-                System.out.println("Error: This room number is already included in the database");
-                return;
+          //      System.out.println("Error: This room number is already included in the database");
+           //     return;
 
-            }
+           // }
             roomHashSet.add((Room) room);
             mapOfRooms.put(room.getRoomNumber(), room);
 
@@ -83,15 +83,13 @@ public class ReservationService
 
     public Collection<IRoom>  findRooms(Date checkInDate, Date checkOutDate){
 
-
             availableRooms.clear();
 
     for (IRoom room : roomHashSet){
 
-        if (!reservationsHashSet.contains(room))
+        if (!reservationsHashSet.contains(room)) // if there's no any reservation for the current room yet, we add it to the list of available rooms
 
         {
-
             availableRooms.add(room);
             continue;
         }
@@ -133,10 +131,17 @@ public class ReservationService
 
     public void printAllReservations(){
 
-        for (Reservation reservation : reservationsHashSet){
+        if (reservationsHashSet.isEmpty())
+        {  System.out.println("There are no reservations in the database");
 
-            reservation.toString();
         }
+        else {
+            for (Reservation reservation : reservationsHashSet) {
+
+                reservation.toString();
+            }
+        }
+        return;
     }
 
     //create collections to store and retrieve a reservation
