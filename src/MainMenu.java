@@ -5,6 +5,7 @@ import model.IRoom;
 import model.Reservation;
 import model.Room;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,7 +17,7 @@ public class MainMenu {
 
 
     public static MainMenu instanceMainMenu = null;
-    private static Scanner emailScan = new Scanner(System.in);
+    //private static Scanner emailScan = new Scanner(System.in);
     private static Collection<IRoom> availableRooms = new HashSet<>();
     private static Collection<Customer> allCustomers = new HashSet<>();
     private static Collection<Reservation> reservationCollection = new HashSet<>();
@@ -36,9 +37,6 @@ public class MainMenu {
             //System.out.println("keep running " + keepRunning);
 
                 try {
-
-
-
 
                     System.out.println("Welcome to the Hotel Reservation Application\n");
                     System.out.println("----------------------------------------");
@@ -60,17 +58,16 @@ public class MainMenu {
 
                         case "1":
                             findReserveRoom();
-
                             break;
 
                         case "2":
-
+                            seeReservations();
                             break;
                         case "3":
-
+                            //create account
                             String email = getEmail();
-                            String firstName = getFirstOrLastName("First Name");
-                            String lastName = getFirstOrLastName("Last Name");
+                            String firstName = getFirstOrLastName("First Name (first Letter must be upper case)");
+                            String lastName = getFirstOrLastName("Last Name (first Letter must be upper case)");
                             instanceHotelResource.createACustomer(email, firstName, lastName);
                             break;
                         case "4":
@@ -78,14 +75,10 @@ public class MainMenu {
                             break;
                         case "5":
                             keepRunning = false;
-
-                            //return;
                             break;
                         default:
                             System.out.println("Please enter a number between 1 and 5");
                     }
-
-
 
                 } catch (Exception ex) {
                     System.out.println(ex.toString() + "\n");
@@ -98,12 +91,41 @@ public class MainMenu {
     }
 
 
+    public static void seeReservations()
+    {
+
+        reservationCollection.clear();
+        String customersEmail = getEmail();
+
+        reservationCollection = instanceHotelResource.getCustomersReservations(customersEmail);
+        if (reservationCollection.isEmpty()) {
+            System.out.println("There are no reservations for this customer\n");
+            return;
+        }
+        else {
+
+            for (Reservation currentReservation : reservationCollection ){
+
+                currentReservation.toString();
+            }
+        }
+        return;
+
+    }
+
     public static String getSwitchOption()
         {
 
             String switchOption;
 
+            try {
+                System.in.available();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             Scanner mainMenuScanner = new Scanner(System.in);
+
 
 
             switchOption = mainMenuScanner.nextLine();
@@ -144,15 +166,17 @@ public class MainMenu {
                         if (yesNo.equals("y")) {
                             //call bookRom function
                             callBookRoom(checkInDate, checkOutDate);
-                            keepRunning = false;
+                            return;
+                            //keepRunning = false;
                         }
                         if (yesNo.equals("n")) {
                             //go back to main menu
-                            keepRunning = false;
+                            return;
+                            //keepRunning = false;
                             //return ;
                         } else {
 
-                            throw new IllegalArgumentException("Error, Invalid format, please enter numbers only y or n\n");
+                            throw new IllegalArgumentException("Error, Invalid format, please enter numbers only \"y\" or \"n\"\n");
                         }
                 }catch (Exception ex){
                     System.out.println("Error - Invalid Input\n");

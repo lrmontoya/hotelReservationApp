@@ -8,6 +8,7 @@ import service.ReservationService;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 
 public class HotelResource {
 
@@ -56,16 +57,24 @@ public class HotelResource {
         return reservationService.reserveARoom(customer, room, checkInDate, checkOutDate);
     }
 
-    public Collection<Reservation> getCustomersReservations (String customerEmail){
-        Customer customer =  null;
+    public Collection<Reservation> getCustomersReservations (String customersEmail){
+        Collection<Reservation> reservationsPerCust= new HashSet<>();
+        //Customer customer =  null;
+        Customer customer = getCustomer(customersEmail);
         try {
-            customer = getCustomer(customerEmail);
-        } catch (IllegalArgumentException ex)
+
+            if (customer.equals(null)) {
+
+                throw new NullPointerException();
+            }
+        } catch (Exception ex)
         {
-            System.out.println("The email address provided is not in the database");
-            System.out.println(ex.getLocalizedMessage());
+            System.out.println("The email address provided is not in the database.");
+
+            return reservationsPerCust; // if cust does not exist, return null.
         }
-        return reservationService.getCustomersReservation(customerService.getCustomer(customerEmail));
+        reservationsPerCust =  reservationService.getCustomersReservation(customer);
+        return reservationsPerCust;
     }
 
     public Collection<IRoom> findARoom(Date checkIn, Date checkOut ){

@@ -51,7 +51,7 @@ public class CustomerService {
 
     public Customer getCustomer(String customerEmail){
 
-           if (!mapOfCustomers.containsKey(customerEmail)) {
+             if (!mapOfCustomers.containsKey(customerEmail)) {
 
                 //System.out.println("Error: there are no customers registered with the email provided\n");
                 return null;
@@ -61,7 +61,7 @@ public class CustomerService {
             }
            else {
 
-               return mapOfCustomers.get(customerEmail);
+                 return mapOfCustomers.get(customerEmail);
 
            }
 
